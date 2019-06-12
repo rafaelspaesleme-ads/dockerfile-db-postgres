@@ -1,22 +1,22 @@
 #!/bin/bash
 
-echo "Verifying DB $DB_NAME presence ..."
+echo "Verificando se DB $DB_NAME esta presente..."
 result=`psql -v ON_ERROR_STOP=on -U "$POSTGRES_USER" -d postgres -t -c "SELECT 1 FROM pg_database WHERE datname='$DB_NAME';" | xargs`
 if [[ $result == "1" ]]; then
-  echo "$DB_NAME DB already exists"
+  echo "$DB_NAME DB já existe."
 else
-  echo "$DB_NAME DB does not exist, creating it ..."
+  echo "$DB_NAME DB não existe... criando..."
 
-  echo "Verifying role $DB_USER presence ..."
+  echo "Verificando se há regras de $DB_USER presente..."
   result=`psql -v ON_ERROR_STOP=on -U "$POSTGRES_USER" -d postgres -t -c "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER';" | xargs`
   if [[ $result == "1" ]]; then
-    echo "$DB_USER role already exists"
+    echo "Regras do usuário $DB_USER existente."
   else
-    echo "$DB_USER role does not exist, creating it ..."
+    echo "Regras do usuário $DB_USER não existe, criando..."
     psql -v ON_ERROR_STOP=on -U "$POSTGRES_USER" <<-EOSQL
       CREATE ROLE $DB_USER WITH LOGIN ENCRYPTED PASSWORD '${DB_PASSWD}';
 EOSQL
-    echo "$DB_USER role successfully created"
+    echo "regras do usuário $DB_USER criado com sucesso!"
   fi
 
   psql -v ON_ERROR_STOP=on -U "$POSTGRES_USER" <<-EOSQL
@@ -25,8 +25,8 @@ EOSQL
 EOSQL
   result=$?
   if [[ $result == "0" ]]; then
-    echo "$DB_NAME DB successfully created"
+    echo "DB $DB_NAME criado com sucesso!"
   else
-    echo "$DB_NAME DB could not be created"
+    echo "DB $DB_NAME não criado."
   fi
 fi
